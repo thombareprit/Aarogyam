@@ -69,23 +69,34 @@ embeddings = WatsonxEmbeddings(
 docsearch = Chroma.from_documents(documents, embeddings)
 
 @app.route('/watsonchat', methods=['GET'])
+from flask import Flask, request, jsonify
+from langchain.chains import RetrievalQA
+
+@app.route('/watsonchat', methods=['POST'])
 def watsonchat():
     try:
         # Parse the query from the request
         data = request.get_json()
-        query = data.get("query", "")
+        user_query = data.get("query", "")
 
-        if not query:
+        if not user_query:
             return jsonify({"error": "No query provided"}), 400
+
+        # Format the query with additional instructions
+        formatted_query = (
+            f"Provide Ayurvedic remedies, dietary norms, yoga/exercise, and lifestyle precautions, "
+            f"avoiding allopathic medicines for the query: {user_query}"
+        )
 
         # Build RetrievalQA
         qa = RetrievalQA.from_chain_type(llm=watsonx_granite, chain_type="stuff", retriever=docsearch.as_retriever())
 
         # Get the response from Watson AI
-        response = qa.invoke(query)
-        return jsonify({"query": query, "response": response})
+        response = qa.invoke(formatted_query)
+        return jsonify({"query": user_query, "formatted_query": formatted_query, "response": response})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route('/')
 def index():
