@@ -20,9 +20,9 @@ CORS(app)  # Allow cross-origin requests for API access
 # Watsonx AI credentials setup
 credentials = Credentials(
     url="https://eu-gb.ml.cloud.ibm.com",
-    api_key="V_eGYYPGCZguAymSoheVcWlyKoj-0lh8ltj_WASW337G"
+    api_key="V_eGYYPGCZguAymSoheVcWlyKoj-0lh8ltj_WASW337G" #API key
 )
-project_id = os.getenv("PROJECT_ID", "e0a3e29c-bb3b-4e9b-8302-08a77ed7fe1b")
+project_id = os.getenv("PROJECT_ID", "e0a3e29c-bb3b-4e9b-8302-08a77ed7fe1b") #Project ID
 
 # Initialize Watsonx Granite model
 model_id = ModelTypes.GRANITE_13B_CHAT_V2
@@ -42,7 +42,7 @@ watsonx_granite = WatsonxLLM(
 )
 
 # PDF processing (if needed for context documents)
-pdf_file_path = "AarogyamDataset.pdf"
+pdf_file_path = "AarogyamDataset.pdf" #PDF path
 pdf_text = ""
 
 with open(pdf_file_path, "rb") as f:
