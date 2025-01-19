@@ -68,10 +68,6 @@ embeddings = WatsonxEmbeddings(
 )
 docsearch = Chroma.from_documents(documents, embeddings)
 
-@app.route('/watsonchat', methods=['GET'])
-from flask import Flask, request, jsonify
-from langchain.chains import RetrievalQA
-
 @app.route('/watsonchat', methods=['POST'])
 def watsonchat():
     try:
@@ -96,7 +92,6 @@ def watsonchat():
         return jsonify({"query": user_query, "formatted_query": formatted_query, "response": response})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 @app.route('/')
 def index():
