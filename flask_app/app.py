@@ -7,8 +7,8 @@ import PyPDF2
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.docstore.document import Document
 from langchain_ibm import WatsonxEmbeddings, WatsonxLLM
-from langchain_chains import RetrievalQA
-from langchain_chroma import Chroma
+from langchain.chains import RetrievalQA
+from langchain.vectorstores import Chroma
 from ibm_watsonx_ai.foundation_models.utils.enums import ModelTypes
 from ibm_watsonx_ai.metanames import GenTextParamsMetaNames as GenParams
 from ibm_watsonx_ai.foundation_models.utils.enums import DecodingMethods
