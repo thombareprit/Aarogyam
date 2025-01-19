@@ -73,7 +73,7 @@ def watsonchat():
     try:
         # Parse the query from the request
         data = request.get_json()
-        user_query = data.get("query", "")
+        user_query = data.get('query')
 
         if not user_query:
             return jsonify({"error": "No query provided"}), 400
@@ -98,4 +98,4 @@ def index():
     return "Watson Chat API is running!"
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(debug=True)
