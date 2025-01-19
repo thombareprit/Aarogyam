@@ -3,7 +3,7 @@ langchain
 langchain-ibm
 langchain-chroma
 ibm-watson
-chroma-db
+chromadb
 flask==2.2.5
 requests==2.31.0
 ibm-watsonx-ai
