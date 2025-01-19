@@ -1,0 +1,8 @@
+wget
+langchain>=0.3,<0.4
+ibm_watsonx_ai==1.1.16
+langchain_ibm>=0.3,<0.4
+langchain_chroma>=0.1,<0.2
+PyPDF2
+chromadb
+
