@@ -68,7 +68,7 @@ embeddings = WatsonxEmbeddings(
 )
 docsearch = Chroma.from_documents(documents, embeddings)
 
-@app.route('/watsonchat', methods=['GET'])
+@app.route('/watsonchat', methods=['POST'])
 def watsonchat():
     try:
         # Parse the query from the request
