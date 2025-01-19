@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: watson-flask-api
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python flask_server.py
