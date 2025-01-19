@@ -80,16 +80,16 @@ def watsonchat():
 
         # Format the query with additional instructions
         formatted_query = (
-            f"Provide Ayurvedic remedies, dietary norms, yoga/exercise, and lifestyle precautions, "
-            f"avoiding allopathic medicines for the query: {user_query}"
+            f"Bullet points with short descriptions are preferred. Return the response as minimal HTML <body> content, structured with headings, bullet points, and bolded critical information."
+            f"Ensure the output is plain text, concise, and suitable for mobile app display. Provide Ayurvedic remedies, dietary norms, yoga/exercise, and lifestyle precautions, avoiding allopathic medicines for the query: {user_query}"
         )
 
         # Build RetrievalQA
         qa = RetrievalQA.from_chain_type(llm=watsonx_granite, chain_type="stuff", retriever=docsearch.as_retriever())
 
         # Get the response from Watson AI
-        response = qa.invoke(formatted_query)
-        return jsonify({"query": user_query, "formatted_query": formatted_query, "response": response})
+        aiResponse = qa.invoke(formatted_query)
+        return jsonify({"response": aiResponse.get("response")})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
