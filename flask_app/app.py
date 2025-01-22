@@ -22,7 +22,7 @@ credentials = Credentials(
     url="https://eu-gb.ml.cloud.ibm.com",
     api_key="QNRC4kplnED7ic6JiF5My5PNRTh1BNQez4hMdH4F4jAc" #API key
 )
-project_id = os.getenv("PROJECT_ID", "49b58b06-0323-4022-8048-fcd93bec9524") #Project ID
+project_id = os.getenv("PROJECT_ID", "3e9c6eee-937f-4cab-a20c-f4e8fbe8f862") #Project ID
 
 # Initialize Watsonx Granite model
 model_id = ModelTypes.GRANITE_13B_CHAT_V2
