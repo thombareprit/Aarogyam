@@ -20,9 +20,9 @@ CORS(app)  # Allow cross-origin requests for API access
 # Watsonx AI credentials setup
 credentials = Credentials(
     url="https://eu-gb.ml.cloud.ibm.com",
-    api_key="Lq0RPu2hk3_Js58r8v_6QP80yDp9gWCoXhqzrTPl0h4W" #API key
+    api_key="U4EE4SOGSKX_3eKMPDY0wMR5l7gcw-WmsGz88EAwG8lF" #API key
 )
-project_id = os.getenv("PROJECT_ID", "3e9c6eee-937f-4cab-a20c-f4e8fbe8f862") #Project ID
+project_id = os.getenv("PROJECT_ID", "fa51d7ee-4ca0-473a-b741-45dd29e0b2e4") #Project ID
 
 # Initialize Watsonx Granite model
 model_id = ModelTypes.GRANITE_13B_CHAT_V2
