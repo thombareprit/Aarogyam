@@ -20,7 +20,7 @@ CORS(app)  # Allow cross-origin requests for API access
 # Watsonx AI credentials setup
 credentials = Credentials(
     url="https://eu-gb.ml.cloud.ibm.com",
-    api_key="QNRC4kplnED7ic6JiF5My5PNRTh1BNQez4hMdH4F4jAc" #API key
+    api_key="Lq0RPu2hk3_Js58r8v_6QP80yDp9gWCoXhqzrTPl0h4W" #API key
 )
 project_id = os.getenv("PROJECT_ID", "3e9c6eee-937f-4cab-a20c-f4e8fbe8f862") #Project ID
 
