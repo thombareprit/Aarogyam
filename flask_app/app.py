@@ -9,7 +9,6 @@ from langchain.docstore.document import Document
 from langchain_ibm import WatsonxEmbeddings, WatsonxLLM
 from langchain.chains import RetrievalQA
 from langchain_community.vectorstores import Chroma
-from ibm_watsonx_ai.foundation_models.utils.enums import ModelTypes
 from ibm_watsonx_ai.metanames import GenTextParamsMetaNames as GenParams
 from ibm_watsonx_ai.foundation_models.utils.enums import DecodingMethods
 
@@ -19,13 +18,13 @@ CORS(app)  # Allow cross-origin requests for API access
 
 # Watsonx AI credentials setup
 credentials = Credentials(
-    url="https://eu-gb.ml.cloud.ibm.com", #############URL##############
-    api_key="evMTYcd3CQ6bY-ktmHsfExx4pq9gPeqBoCVoZbCgcTY-" ############API key#############
+    url="https://eu-gb.ml.cloud.ibm.com",  # URL
+    api_key="evMTYcd3CQ6bY-ktmHsfExx4pq9gPeqBoCVoZbCgcTY-"  # API key
 )
-project_id = os.getenv("PROJECT_ID", "ffa1d295-95bc-40a6-8fa8-7425f0d54b3e") ############Project ID#############
+project_id = os.getenv("PROJECT_ID", "ffa1d295-95bc-40a6-8fa8-7425f0d54b3e")  # Project ID
 
 # Initialize Watsonx Granite model
-model_id = ModelTypes.GRANITE_13B_INSTRUCT_V2
+model_id = "ibm/granite-13b-instruct-v2"
 parameters = {
     GenParams.DECODING_METHOD: DecodingMethods.GREEDY,
     GenParams.MIN_NEW_TOKENS: 1,
@@ -33,40 +32,55 @@ parameters = {
     GenParams.STOP_SEQUENCES: ["<|endoftext|>"]
 }
 
+# Initialize the LLM
 watsonx_granite = WatsonxLLM(
-    model_id=model_id.value,
+    model_id=model_id,
     url=credentials.get("url"),
     apikey=credentials.get("apikey"),
     project_id=project_id,
     params=parameters
 )
 
-# PDF processing (if needed for context documents)
-pdf_file_path = "AarogyamDataset.pdf" ##################PDF path#######################
+# Process the PDF file for context documents
+pdf_file_path = "AarogyamDataset.pdf"  # PDF path
 pdf_text = ""
-
-with open(pdf_file_path, "rb") as f:
-    pdf_reader = PyPDF2.PdfReader(f)
-    for page in pdf_reader.pages:
-        pdf_text += page.extract_text()
+try:
+    with open(pdf_file_path, "rb") as f:
+        pdf_reader = PyPDF2.PdfReader(f)
+        for page in pdf_reader.pages:
+            pdf_text += page.extract_text()
+    print("info\nPDF successfully processed.")
+except Exception as e:
+    print(f"error\nFailed to process PDF: {e}")
+    pdf_text = ""
 
 # Split PDF text into chunks
-text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=512,
-    chunk_overlap=50,
-    length_function=len
-)
-chunks = text_splitter.split_text(pdf_text)
-documents = [Document(page_content=chunk) for chunk in chunks]
+try:
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=512,
+        chunk_overlap=50,
+        length_function=len
+    )
+    chunks = text_splitter.split_text(pdf_text)
+    documents = [Document(page_content=chunk) for chunk in chunks]
+    print(f"info\nTotal document chunks created: {len(documents)}")
+except Exception as e:
+    print(f"error\nFailed to split PDF text: {e}")
+    documents = []
 
 # Create vector store for document retrieval
-embeddings = WatsonxEmbeddings(
-    model_id="ibm/slate-30m-english-rtrvr",
-    url=credentials["url"],
-    apikey=credentials["apikey"],
-    project_id=project_id
-)
-docsearch = Chroma.from_documents(documents, embeddings)
+try:
+    embeddings = WatsonxEmbeddings(
+        model_id="ibm/slate-30m-english-rtrvr",
+        url=credentials["url"],
+        apikey=credentials["apikey"],
+        project_id=project_id
+    )
+    docsearch = Chroma.from_documents(documents, embeddings)
+    print("info\nVector store successfully created.")
+except Exception as e:
+    print(f"error\nFailed to create vector store: {e}")
+    docsearch = None
 
 @app.route('/watsonchat', methods=['POST'])
 def watsonchat():
@@ -76,7 +90,10 @@ def watsonchat():
         user_query = data.get('query')
 
         if not user_query:
+            print("error\nNo query provided in the request.")
             return jsonify({"error": "No query provided"}), 400
+
+        print(f"info\nUser Query: {user_query}")
 
         # Format the query with additional instructions
         formatted_query = (
@@ -84,13 +101,28 @@ def watsonchat():
             f"Ensure the output is plain text, concise, and suitable for mobile app display. Provide Ayurvedic remedies, dietary norms, yoga/exercise, and lifestyle precautions, avoiding allopathic medicines for the query: {user_query}"
         )
 
+        print(f"critical\nFormatted Query: {formatted_query}")
+
+        # Ensure the vector store is initialized
+        if not docsearch:
+            print("error\nVector store is not initialized.")
+            return jsonify({"error": "Vector store is not initialized"}), 500
+
         # Build RetrievalQA
         qa = RetrievalQA.from_chain_type(llm=watsonx_granite, chain_type="stuff", retriever=docsearch.as_retriever())
 
         # Get the response from Watson AI
         aiResponse = qa.invoke(formatted_query)
-        return jsonify({"response": aiResponse.get("response")})
+        print(f"critical\nAI Response: {aiResponse}")
+
+        ai_response_result = aiResponse.get("result")
+        if not ai_response_result:
+            print("error\nAI did not return a valid result.")
+            return jsonify({"error": "AI did not return a valid result."}), 500
+
+        return jsonify({"response": ai_response_result})
     except Exception as e:
+        print(f"error\nException: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/')
