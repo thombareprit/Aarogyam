@@ -1,0 +1,3 @@
+curl -X POST https://aarogyam.onrender.com/watsonchat \
+-H "Content-Type: application/json" \
+-d '{"query": "What are the symptoms of fever?"}'
